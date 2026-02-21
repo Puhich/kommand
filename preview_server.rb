@@ -1,4 +1,16 @@
-require 'sinatra'
+# ─── Build mode detection (before Sinatra loads) ────────────────────────────
+BUILD_MODE = ARGV.include?('--build')
+BUILD_OUTPUT = BUILD_MODE ? File.expand_path(ARGV[ARGV.index('--output')&.+(1)] || 'docs', __dir__) : nil
+
+# Strip our flags so Sinatra doesn't choke on them
+ARGV.reject! { |a| a == '--build' || a == '--output' || (!a.start_with?('-') && ARGV[ARGV.index(a).to_i - 1] == '--output') rescue false }
+
+unless BUILD_MODE
+  require 'sinatra'
+  set :port, 4567
+  set :bind, 'localhost'
+end
+
 require 'erb'
 require 'cgi'
 require 'json'
@@ -10,9 +22,6 @@ CLAUDE_MD_PATH  = File.expand_path('CLAUDE.md', __dir__)
 PREVIEW_CSS     = File.expand_path('preview.css', __dir__)
 TAILWIND_INPUT  = File.expand_path('.tailwind-input.css', __dir__)
 TAILWIND_CONFIG = File.expand_path('.tailwind-safelist.txt', __dir__)
-
-set :port, 4567
-set :bind, 'localhost'
 
 # ─── Rails-like polyfills ────────────────────────────────────────────────────
 class String
@@ -416,9 +425,58 @@ end
 component_count = Dir.glob(File.join(COMPONENTS_PATH, '_*.erb')).size
 puts "   Found #{component_count} components"
 generate_tailwind_css!
+
+if BUILD_MODE
+  # ─── Static Build Mode ──────────────────────────────────────────────────
+  puts "📦 Building static site to #{BUILD_OUTPUT}/"
+  FileUtils.mkdir_p(BUILD_OUTPUT)
+
+  files = Dir.glob(File.join(COMPONENTS_PATH, '_*.erb')).sort
+  @components = files.map do |f|
+    name = File.basename(f).sub(/\A_/, '').sub(/\.html\.erb\z/, '').sub(/\.erb\z/, '')
+    { name: name, file: f, filename: File.basename(f), demo_html: render_demo(f), source: File.read(f), highlighted: highlight_erb_source(File.read(f)) }
+  end
+  @tokens = parse_tokens_from_claude_md
+  @sidebar_logo = render_sidebar_logo
+
+  # Read the template from __END__ section
+  template_data = File.read(__FILE__).split("__END__\n", 2).last
+  template_src = template_data.sub(/\A\s*@@index\s*\n/, '')
+
+  # Inline CSS: replace <link href="/preview.css"> with <style>contents</style>
+  preview_css = File.exist?(PREVIEW_CSS) ? File.read(PREVIEW_CSS) : ''
+  template_src = template_src.gsub(
+    '<link href="/preview.css" rel="stylesheet">',
+    "<style>\n#{preview_css}\n</style>"
+  )
+
+  # Remove regenerate link (not available in static mode)
+  template_src = template_src.gsub('href="/regenerate"', 'href="#" onclick="return false"')
+
+  # Render
+  b = binding
+  html = ERB.new(template_src, trim_mode: '-').result(b)
+
+  File.write(File.join(BUILD_OUTPUT, 'index.html'), html)
+
+  # CNAME file for GitHub Pages custom domain
+  cname_file = File.join(BUILD_OUTPUT, 'CNAME')
+  unless File.exist?(cname_file)
+    # Don't overwrite if user has their own
+    puts "   💡 Create #{BUILD_OUTPUT}/CNAME with your domain to enable custom domain"
+  end
+
+  size_kb = (File.size(File.join(BUILD_OUTPUT, 'index.html')) / 1024.0).round(1)
+  puts "✅ Built index.html (#{size_kb}KB)"
+  puts "   Open: file://#{File.join(BUILD_OUTPUT, 'index.html')}"
+  exit 0
+end
+
 puts "   Starting server at http://localhost:4567\n\n"
 
-# ─── Routes ──────────────────────────────────────────────────────────────────
+# ─── Routes (Sinatra only) ──────────────────────────────────────────────────
+unless BUILD_MODE
+
 get '/preview.css' do
   content_type 'text/css'
   File.exist?(PREVIEW_CSS) ? File.read(PREVIEW_CSS) : ''
@@ -439,6 +497,8 @@ get '/' do
   @sidebar_logo = render_sidebar_logo
   erb :index
 end
+
+end # unless BUILD_MODE
 
 __END__
 
