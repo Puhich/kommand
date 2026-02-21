@@ -578,11 +578,11 @@ __END__
 
     .page-section { display: none; }
     .page-section.active { display: block; }
-    .section-subtitle { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #A8A29E; margin-bottom: 16px; }
+    .section-subtitle { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #A8A29E; margin-bottom: 24px; }
 
     /* ── Cards ── */
     html { scroll-behavior: smooth; }
-    .card { background: white; border: 1px solid #E7E5E4; border-radius: 12px; margin-bottom: 20px; overflow: hidden; transition: border-color 0.15s ease, box-shadow 0.15s ease; scroll-margin-top: 20px; box-shadow: 0 0 0 rgba(0,0,0,0); }
+    .card { background: white; border: 1px solid #E7E5E4; border-radius: 12px; margin-bottom: 20px; transition: border-color 0.15s ease, box-shadow 0.15s ease; scroll-margin-top: 20px; box-shadow: 0 0 0 rgba(0,0,0,0); }
     .card:hover { border-color: #D6D3D1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .bottom-spacer { height: 60vh; }
     .card-header { padding: 10px 16px; border-bottom: 1px solid #E7E5E4; display: flex; align-items: center; justify-content: space-between; }
@@ -592,12 +592,12 @@ __END__
     .tab { padding: 8px 10px; font-size: 12px; font-weight: 500; color: #78716C; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.1s; user-select: none; }
     .tab:hover { color: #1C1917; }
     .tab.active { color: #1c64f2; border-bottom-color: #1c64f2; }
-    .preview-area { padding: 28px; min-height: 60px; }
+    .preview-area { padding: 28px; min-height: 60px; border-radius: 0 0 11px 11px; }
     .preview-stone { background: #FAFAF9; }
     .preview-white { background: white; }
     .preview-dark  { background: #1C1917; }
-    .code-wrapper { position: relative; }
-    .code-block { background: #1C1917; color: #D6D3D1; font-family: 'Menlo', 'SF Mono', monospace; font-size: 12px; line-height: 1.6; padding: 20px; padding-right: 80px; padding-bottom: 24px; overflow-x: auto; white-space: pre; margin: 0; }
+    .code-wrapper { position: relative; background: #1C1917; border-radius: 0 0 11px 11px; }
+    .code-block { color: #D6D3D1; font-family: 'Menlo', 'SF Mono', monospace; font-size: 12px; line-height: 1.6; padding: 20px 80px 24px 20px; overflow-x: auto; white-space: pre; margin: 0; }
     .code-block::-webkit-scrollbar { height: 12px; }
     .code-block::-webkit-scrollbar-track { background: #1C1917; margin: 0 16px; }
     .code-block::-webkit-scrollbar-thumb { background: #57534E; border-radius: 6px; border: 3px solid #1C1917; }
@@ -609,13 +609,14 @@ __END__
     .hl-erb { color: #A78BFA; }
     .hl-comment { color: #6B7280; font-style: italic; }
     .hl-class { color: #38BDF8; }
-    .copy-btn { position: absolute; top: 10px; right: 10px; padding: 5px 10px; font-size: 11px; font-weight: 500; color: #A8A29E; background: #292524; border: 1px solid #44403C; border-radius: 6px; cursor: pointer; transition: all 0.1s; font-family: 'Inter', sans-serif; z-index: 2; }
+    .copy-btn-wrap { position: sticky; top: 10px; float: right; z-index: 2; margin: 10px 10px 0 0; }
+    .copy-btn { padding: 5px 10px; font-size: 11px; font-weight: 500; color: #A8A29E; background: #292524; border: 1px solid #44403C; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; }
     .copy-btn:hover { color: white; background: #44403C; }
     .copy-btn.copied { color: #4ade80; border-color: #4ade80; }
 
     /* ── Tokens ── */
     .token-section { margin-bottom: 32px; }
-    .token-section-title { font-size: 15px; font-weight: 600; color: #1C1917; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #E7E5E4; }
+    .token-section-title { font-size: 15px; font-weight: 600; color: #1C1917; margin-bottom: 10px; }
     .token-grid { display: grid; gap: 6px; }
     .token-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: white; border: 1px solid #E7E5E4; border-radius: 8px; cursor: pointer; transition: all 0.1s; position: relative; }
     .token-row:hover { border-color: #D6D3D1; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
@@ -718,7 +719,7 @@ __END__
         <div id="<%= c[:name] %>-dark"  class="preview-area preview-dark"  style="display:none"><%= c[:demo_html] %></div>
         <div id="<%= c[:name] %>-code"  style="display:none">
           <div class="code-wrapper">
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <div class="copy-btn-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
             <pre class="code-block"><%= c[:highlighted] %></pre>
           </div>
         </div>
@@ -865,7 +866,7 @@ __END__
   }
 
   function copyCode(btn) {
-    const code = btn.parentElement.querySelector('.code-block').textContent;
+    const code = btn.closest('.code-wrapper').querySelector('.code-block').textContent;
     copyToClipboard(code).then(() => {
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
