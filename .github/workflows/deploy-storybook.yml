@@ -1,0 +1,52 @@
+name: Deploy Storybook
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/views/components/**'
+      - 'preview_server.rb'
+      - 'CLAUDE.md'
+  workflow_dispatch: # manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install dependencies
+        run: gem install sinatra erb
+
+      - name: Build static storybook
+        run: ruby preview_server.rb --build --output docs
+
+      - name: Add CNAME
+        run: echo "fuckfuckfuck.ru" > docs/CNAME
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
