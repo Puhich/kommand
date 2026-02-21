@@ -1,0 +1,27 @@
+<%# Reusable Button – Manuplan/Kommand design %>
+<%# Figma: https://www.figma.com/design/y72qegAl9lnEZKgxcAsddY/Manuplan--test-?node-id=3038-12891 %>
+<%# Locals: text:, left_icon: (optional, raw SVG html_safe) %>
+<%# Demo: render 'components/button', demo: true %>
+
+<% if local_assigns[:demo] %>
+  <% plus_icon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>'.html_safe %>
+  <div class="flex flex-col gap-3 p-6" style="font-family:Inter,ui-sans-serif,system-ui,sans-serif">
+    <div class="flex gap-3">
+      <%= render 'components/button', text: 'Поделиться' %>
+    </div>
+    <div class="flex gap-3">
+      <%= render 'components/button', text: 'Создать шаг', left_icon: plus_icon %>
+    </div>
+  </div>
+<% else %>
+  <button
+    type="button"
+    class="inline-flex items-center justify-center gap-1.5 rounded-xl border-none bg-[#1c64f2] px-4 py-2.5 text-sm font-medium leading-[1.5] text-white shadow-[0px_6px_16px_0px_rgba(28,100,242,0.20)] transition-colors duration-150 hover:bg-[#1a56db] active:bg-[#1e3a8a] focus:outline-none cursor-pointer"
+    style="font-family:Inter,ui-sans-serif,system-ui,sans-serif"
+  >
+    <% if local_assigns[:left_icon].present? %>
+      <span class="shrink-0 inline-flex w-6 h-6" aria-hidden><%= left_icon %></span>
+    <% end %>
+    <span><%= text %></span>
+  </button>
+<% end %>

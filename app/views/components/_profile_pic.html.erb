@@ -1,0 +1,36 @@
+<%# ProfilePic – single avatar. Manuplan/Kommand design %>
+<%# Figma: node 3023-6416 for exact sm/md/lg px (fallback: 24, 32, 40). %>
+<%# Locals: src: (image URL), size: (:sm | :md | :lg), shape: (:circle | :square) %>
+<%# Demo: render 'components/profile_pic', demo: true %>
+
+<% if local_assigns[:demo] %>
+  <%# All 6 variants in one row: sm/md/lg × circle/square %>
+  <div class="flex flex-wrap items-center gap-4 p-6">
+    <%= render 'components/profile_pic', src: 'https://i.pravatar.cc/100?u=1', size: :sm, shape: :circle %>
+    <%= render 'components/profile_pic', src: 'https://i.pravatar.cc/100?u=2', size: :sm, shape: :square %>
+    <%= render 'components/profile_pic', src: 'https://i.pravatar.cc/100?u=3', size: :md, shape: :circle %>
+    <%= render 'components/profile_pic', src: 'https://i.pravatar.cc/100?u=4', size: :md, shape: :square %>
+    <%= render 'components/profile_pic', src: 'https://i.pravatar.cc/100?u=5', size: :lg, shape: :circle %>
+    <%= render 'components/profile_pic', src: 'https://i.pravatar.cc/100?u=6', size: :lg, shape: :square %>
+  </div>
+<% else %>
+  <%
+    size_key = (local_assigns[:size].presence || :md).to_sym
+    shape_key = (local_assigns[:shape].presence || :circle).to_sym
+    diameters = { sm: 24, md: 32, lg: 40 }
+    d = diameters[size_key] || 32
+    # square: sm → rounded-md (6px), md/lg → rounded-xl (12px). xl on 24px looks like circle.
+    shape_class = if shape_key == :square
+      size_key == :sm ? 'rounded-md' : 'rounded-xl'
+    else
+      'rounded-full'
+    end
+  %>
+  <img
+    src="<%= local_assigns[:src] %>"
+    alt=""
+    role="presentation"
+    class="<%= shape_class %> object-cover shrink-0"
+    style="width: <%= d %>px; height: <%= d %>px;"
+  />
+<% end %>
