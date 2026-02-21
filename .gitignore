@@ -1,12 +1,7 @@
-# Tailwind temp files
 .tailwind-input.css
 .tailwind.config.js
 .tailwind-safelist.txt
 safelist.html
 preview.css
 docs/
-
-# System
 .DS_Store
-*.swp
-*~
