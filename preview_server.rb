@@ -467,6 +467,15 @@ if BUILD_MODE
   else
     puts "   💡 Place og.png in project root for OG preview image"
   end
+
+  # Copy favicon if it exists
+  fav_src = File.expand_path('favicon.svg', __dir__)
+  if File.exist?(fav_src)
+    FileUtils.cp(fav_src, File.join(BUILD_OUTPUT, 'favicon.svg'))
+    puts "   🎨 Copied favicon.svg"
+  else
+    puts "   💡 Place favicon.svg in project root for favicon"
+  end
   cname_file = File.join(BUILD_OUTPUT, 'CNAME')
   unless File.exist?(cname_file)
     # Don't overwrite if user has their own
@@ -839,9 +848,25 @@ __END__
     document.getElementById(id).classList.toggle('collapsed');
   }
 
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback for non-HTTPS / file://
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
   function copyCode(btn) {
     const code = btn.parentElement.querySelector('.code-block').textContent;
-    navigator.clipboard.writeText(code).then(() => {
+    copyToClipboard(code).then(() => {
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
@@ -849,7 +874,7 @@ __END__
   }
 
   function copyToken(row, value) {
-    navigator.clipboard.writeText(value).then(() => {
+    copyToClipboard(value).then(() => {
       row.classList.add('copied-row');
       const hint = row.querySelector('[class*="copy-hint"]');
       if (hint) {

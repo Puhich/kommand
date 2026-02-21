@@ -1501,9 +1501,25 @@
     document.getElementById(id).classList.toggle('collapsed');
   }
 
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback for non-HTTPS / file://
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
   function copyCode(btn) {
     const code = btn.parentElement.querySelector('.code-block').textContent;
-    navigator.clipboard.writeText(code).then(() => {
+    copyToClipboard(code).then(() => {
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
@@ -1511,7 +1527,7 @@
   }
 
   function copyToken(row, value) {
-    navigator.clipboard.writeText(value).then(() => {
+    copyToClipboard(value).then(() => {
       row.classList.add('copied-row');
       const hint = row.querySelector('[class*="copy-hint"]');
       if (hint) {
@@ -3054,9 +3070,25 @@ Inter
     document.getElementById(id).classList.toggle('collapsed');
   }
 
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback for non-HTTPS / file://
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
   function copyCode(btn) {
     const code = btn.parentElement.querySelector('.code-block').textContent;
-    navigator.clipboard.writeText(code).then(() => {
+    copyToClipboard(code).then(() => {
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
@@ -3064,7 +3096,7 @@ Inter
   }
 
   function copyToken(row, value) {
-    navigator.clipboard.writeText(value).then(() => {
+    copyToClipboard(value).then(() => {
       row.classList.add('copied-row');
       const hint = row.querySelector('[class*="copy-hint"]');
       if (hint) {
@@ -4608,9 +4640,25 @@ c ui-sans-serifc system-uic sans-serif\]{font-family:Inter,ui-sans-serif,system-
     document.getElementById(id).classList.toggle('collapsed');
   }
 
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback for non-HTTPS / file://
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
   function copyCode(btn) {
     const code = btn.parentElement.querySelector('.code-block').textContent;
-    navigator.clipboard.writeText(code).then(() => {
+    copyToClipboard(code).then(() => {
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
@@ -4618,7 +4666,7 @@ c ui-sans-serifc system-uic sans-serif\]{font-family:Inter,ui-sans-serif,system-
   }
 
   function copyToken(row, value) {
-    navigator.clipboard.writeText(value).then(() => {
+    copyToClipboard(value).then(() => {
       row.classList.add('copied-row');
       const hint = row.querySelector('[class*="copy-hint"]');
       if (hint) {
