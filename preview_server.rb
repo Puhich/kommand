@@ -459,7 +459,14 @@ if BUILD_MODE
 
   File.write(File.join(BUILD_OUTPUT, 'index.html'), html)
 
-  # CNAME file for GitHub Pages custom domain
+  # Copy OG image if it exists
+  og_src = File.expand_path('og.png', __dir__)
+  if File.exist?(og_src)
+    FileUtils.cp(og_src, File.join(BUILD_OUTPUT, 'og.png'))
+    puts "   📷 Copied og.png"
+  else
+    puts "   💡 Place og.png in project root for OG preview image"
+  end
   cname_file = File.join(BUILD_OUTPUT, 'CNAME')
   unless File.exist?(cname_file)
     # Don't overwrite if user has their own
@@ -508,6 +515,15 @@ __END__
 <head>
   <meta charset="UTF-8">
   <title>Kommand — Design System</title>
+  <meta name="description" content="Kommand Design System — component library and design tokens">
+  <meta property="og:title" content="Kommand — Design System">
+  <meta property="og:description" content="Component library and design tokens for Kommand">
+  <meta property="og:image" content="https://kommand.space/og.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kommand.space">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://kommand.space/og.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="/preview.css" rel="stylesheet">
   <style>
